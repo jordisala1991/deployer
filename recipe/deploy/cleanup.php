@@ -27,6 +27,7 @@ task('cleanup', function () {
         run("rm -rf {{releases_path}}/$release");
     }
 
-    run("if [ -e {{release_path}} ]; then rm {{release_path}}; fi");
-    run("if [ -h {{release_path}} ]; then rm {{release_path}}; fi");
+    if (test('[ -e {{release_path}} ]') || test('[ -h {{release_path}} ]')) {
+        run('rm {{release_path}}');
+    }
 });

@@ -9,19 +9,17 @@ namespace Deployer;
 
 desc('Lock deploy');
 task('deploy:lock', function () {
-    $locked = run("if [ -f {{dep_path}}/deploy.lock ]; then echo 'true'; fi")->toBool();
-
-    if ($locked) {
+    if (test('[ -f {{dep_path}}/deploy.lock ]')) {
         throw new \RuntimeException(
             "Deploy locked.\n" .
             "Run deploy:unlock command to unlock."
         );
-    } else {
-        run("touch {{dep_path}}/deploy.lock");
     }
+
+    run('touch {{dep_path}}/deploy.lock');
 });
 
 desc('Unlock deploy');
 task('deploy:unlock', function () {
-    run("rm {{dep_path}}/deploy.lock");
+    run('rm {{dep_path}}/deploy.lock');
 });

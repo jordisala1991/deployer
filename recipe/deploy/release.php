@@ -30,7 +30,7 @@ set('release_name', function () {
  */
 set('releases_list', function () {
     // If there is no releases return empty list.
-    if (!run('[ -d {{releases_path}} ] && [ "$(ls -A {{releases_path}})" ] && echo "true" || echo "false"')->toBool()) {
+    if (!test('[ -d {{releases_path}} ] && [ "$(ls -A {{releases_path}})" ]')) {
         return [];
     }
 
@@ -47,7 +47,7 @@ set('releases_list', function () {
     // Collect releases based on .dep/releases info.
     // Other will be ignored.
 
-    if (run('if [ -f {{dep_path}}/releases ]; then echo "true"; fi')->toBool()) {
+    if (test('[ -f {{dep_path}}/releases ]')) {
         $keepReleases = get('keep_releases');
         if ($keepReleases === -1) {
             $csv = run('cat {{dep_path}}/releases');
@@ -75,9 +75,7 @@ set('releases_list', function () {
 desc('Prepare release');
 task('deploy:release', function () {
     // Clean up if there is unfinished release.
-    $previousReleaseExist = run("if [ -h {{release_path}} ]; then echo 'true'; fi")->toBool();
-
-    if ($previousReleaseExist) {
+    if (test('[ -h {{release_path}} ]')) {
         run('rm -rf "$(readlink {{release_path}})"'); // Delete release.
         run('rm {{release_path}}'); // Delete symlink.
     }
@@ -86,12 +84,10 @@ task('deploy:release', function () {
 
     // Fix collisions.
     $i = 0;
-    while (run("if [ -d {{releases_path}}/$releaseName ]; then echo 'true'; fi")->toBool()) {
+    while (test("[ -d {{releases_path}}/{$releaseName} ]")) {
         $releaseName .= '.' . ++$i;
         set('release_name', $releaseName);
     }
-
-    $releasePath = parse("{{releases_path}}/{{release_name}}");
 
     // Metainfo.
     $date = run('date +"%Y%m%d%H%M%S"');
@@ -100,6 +96,6 @@ task('deploy:release', function () {
     run("echo '$date,{{release_name}}' >> {{dep_path}}/releases");
 
     // Make new release.
-    run("mkdir $releasePath");
-    run("{{bin/symlink}} $releasePath {{release_path}}");
+    run("mkdir {{releases_path}}/{{release_name}}");
+    run("{{bin/symlink}} {{releases_path}}/{{release_name}} {{release_path}}");
 });

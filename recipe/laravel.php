@@ -40,14 +40,18 @@ set('writable_dirs', [
  */
 desc('Disable maintenance mode');
 task('artisan:up', function () {
-    $output = run('if [ -f {{current_path}}/artisan ]; then {{bin/php}} {{current_path}}/artisan up; fi');
-    writeln('<info>' . $output . '</info>');
+    if (test('[ -f {{current_path}}/artisan ]')) {
+        $output = run('{{bin/php}} {{current_path}}/artisan up');
+        writeln('<info>' . $output . '</info>');
+    }
 });
 
 desc('Enable maintenance mode');
 task('artisan:down', function () {
-    $output = run('if [ -f {{current_path}}/artisan ]; then {{bin/php}} {{current_path}}/artisan down; fi');
-    writeln('<info>' . $output . '</info>');
+    if (test('[ -f {{current_path}}/artisan ]')) {
+        $output = run('{{bin/php}} {{current_path}}/artisan down');
+        writeln('<info>' . $output . '</info>');
+    }
 });
 
 desc('Execute artisan migrate');
@@ -109,7 +113,9 @@ task('artisan:optimize', function () {
 desc('Make symlink for public disk');
 task('deploy:public_disk', function () {
     // Remove from source.
-    run('if [ -d $(echo {{release_path}}/public/storage) ]; then rm -rf {{release_path}}/public/storage; fi');
+    if (test('[ -d $(echo {{release_path}}/public/storage) ]')) {
+        run('rm -rf {{release_path}}/public/storage');
+    }
 
     // Create shared dir if it does not exist.
     run('mkdir -p {{shared_path}}/storage/app/public');

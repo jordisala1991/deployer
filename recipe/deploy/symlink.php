@@ -9,7 +9,7 @@ namespace Deployer;
 
 desc('Creating symlink to release');
 task('deploy:symlink', function () {
-    if (run('if [[ "$(man mv)" =~ "--no-target-directory" ]]; then echo "true"; fi')->toBool()) {
+    if (test('[ "$(man mv)" =~ "--no-target-directory" ]')) {
         run("mv -T {{release_path}} {{current_path}}");
     } else {
         // Atomic symlink does not supported.

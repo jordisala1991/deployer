@@ -13,9 +13,13 @@ task('deploy:copy_dirs', function () {
 
     foreach ($dirs as $dir) {
         // Delete directory if exists.
-        run("if [ -d $(echo {{release_path}}/$dir) ]; then rm -rf {{release_path}}/$dir; fi");
+        if (test("[ -d $(echo {{release_path}}/{$dir}) ]")) {
+            run("rm -rf {{release_path}}/{$dir}");
+        }
 
         // Copy directory.
-        run("if [ -d $(echo {{current_path}}/$dir) ]; then cp -rpf {{current_path}}/$dir {{release_path}}/$dir; fi");
+        if (test("[ -d $(echo {{current_path}}/{$dir}) ]")) {
+            run("cp -rpf {{current_path}}/$dir {{release_path}}/$dir");
+        }
     }
 });

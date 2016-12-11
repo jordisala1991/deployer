@@ -63,7 +63,9 @@ task('deploy:create_cache_dir', function () {
     set('cache_dir', '{{release_path}}/' . trim(get('var_dir'), '/') . '/cache');
 
     // Remove cache dir if it exist
-    run('if [ -d "{{cache_dir}}" ]; then rm -rf {{cache_dir}}; fi');
+    if (test('[ -d {{cache_dir}} ]')) {
+        run('rm -rf {{cache_dir}}');
+    }
 
     // Create cache dir
     run('mkdir -p {{cache_dir}}');

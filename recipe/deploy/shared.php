@@ -35,10 +35,14 @@ task('deploy:shared', function () {
     foreach (get('shared_files') as $file) {
         $dirname = dirname($file);
         // Remove from source.
-        run("if [ -f $(echo {{release_path}}/$file) ]; then rm -rf {{release_path}}/$file; fi");
+        if (test("[ -f $(echo {{release_path}}/{$file}) ]")) {
+            run("rm -rf {{release_path}}/{$file}");
+        }
 
         // Ensure dir is available in release
-        run("if [ ! -d $(echo {{release_path}}/$dirname) ]; then mkdir -p {{release_path}}/$dirname;fi");
+        if (test("[ ! -d $(echo {{release_path}}/{$dirname}) ]")) {
+            run("mkdir -p {{release_path}}/{$dirname}");
+        }
 
         // Create dir of shared file
         run("mkdir -p {{shared_path}}/" . $dirname);
